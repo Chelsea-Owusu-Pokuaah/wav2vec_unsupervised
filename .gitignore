@@ -19,10 +19,10 @@ __pycache__/
 data/
 
 # # --- Vendored / built dependencies (clone or build via setup scripts) ---
-# fairseq_/
-# kenlm/
-# rVADfast/
-# sequence/
+fairseq_/
+kenlm/
+rVADfast/
+sequence/
 
 # --- Models & artifacts (download separately) ---
 pre-trained/
