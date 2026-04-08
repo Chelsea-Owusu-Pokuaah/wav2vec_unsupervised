@@ -14,21 +14,24 @@ log "Starting custom setup sequence..."
 basic_dependencies
 # Install essential system packages and libraries required for compilation 
 
-#the if statements, checks for the presence of a gpu.
-if lspci | grep -iq "nvidia"; then
+# Detect NVIDIA GPU (needs pciutils for lspci on minimal/WSL images).
+export WAV2VEC_USE_CPU_TORCH=1
+if command -v lspci >/dev/null 2>&1 && lspci 2>/dev/null | grep -iq "nvidia"; then
     echo "NVIDIA GPU detected. Proceeding with GPU setup..."
+    WAV2VEC_USE_CPU_TORCH=0
 
     cuda_installation
-    # Install the NVIDIA CUDA Toolkit. This provides the compiler (nvcc) and 
+    # Install the NVIDIA CUDA Toolkit. This provides the compiler (nvcc) and
     # libraries needed for GPU acceleration of deep learning frameworks.
-    
+
     # nvidia_drivers_installation
     gpu_drivers_installation
-    # Install or update the proprietary NVIDIA GPU drivers to ensure hardware 
+    # Install or update the proprietary NVIDIA GPU drivers to ensure hardware
     # is correctly recognized and accessible by CUDA.
 else
-    echo "No NVIDIA GPU found. Using CPU-only mode."
+    echo "No NVIDIA GPU found (or lspci unavailable). Using CPU-only PyTorch."
 fi
+export WAV2VEC_USE_CPU_TORCH
 
 create_dirs
 # Create necessary directory structures for storing data, checkpoints, and final output 

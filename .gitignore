@@ -1,0 +1,66 @@
+# --- Local Python ---
+venv/
+.venv/
+env/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# --- Environment & secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Datasets & pipeline outputs (large / machine-local) ---
+data/
+
+# # --- Vendored / built dependencies (clone or build via setup scripts) ---
+# fairseq_/
+# kenlm/
+# rVADfast/
+# sequence/
+
+# --- Models & artifacts (download separately) ---
+pre-trained/
+lid_model/
+
+# --- Logs ---
+*.log
+app.log
+logs/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Tools ---
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+wandb/
+lightning_logs/
+
+# --- OS & editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# --- Build / packaging (root-level) ---
+build/
+dist/
+*.so
+*.o
+
+# --- Misc ---
+nohup.out
+*.tmp
+*.bak

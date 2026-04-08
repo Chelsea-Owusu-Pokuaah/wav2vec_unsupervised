@@ -5,7 +5,7 @@
 
 # Main directories
 #.... directories to add to root.......
-DIR_PATH="$HOME/wav2vec_unsupervised" # the root directory of the project
+DIR_PATH="$HOME/NLP/wav2vec_unsupervised" # the root directory of the project
 DATA_ROOT="$DIR_PATH/data" # a folder that stores all the data generated from pipeline
 FAIRSEQ_ROOT="$DIR_PATH/fairseq_" # the root directory of the fairseq repository
 KENLM_ROOT="$DIR_PATH/kenlm/build/bin"  # Path to KenLM installation

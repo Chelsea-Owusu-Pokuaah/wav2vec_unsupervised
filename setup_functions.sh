@@ -11,7 +11,7 @@ set -x                       # Print each command for debugging
 # Set these variables according to your environment
 
 # Main directories
-INSTALL_ROOT="$HOME/wav2vec_unsupervised"
+INSTALL_ROOT="$HOME/NLP/wav2vec_unsupervised"
 FAIRSEQ_ROOT="$INSTALL_ROOT/fairseq_"
 KENLM_ROOT="$INSTALL_ROOT/kenlm"
 VENV_PATH="$INSTALL_ROOT/venv"
@@ -58,29 +58,30 @@ create_dirs() {
 # ==================== SETUP STEPS ====================
 setup_venv() {
     log "Setting up Python virtual environment..."
-    
-     #setting up pyenv to tackle linkage errors, protobuf requires a python environment which is not static 
+
+    # pyenv: shared lib Python avoids some protobuf / extension linkage issues
     export PYENV_ROOT="$HOME/.pyenv"
 
-    # Install pyenv ONLY if not already installed
     if [ ! -d "$PYENV_ROOT" ]; then
+        log "Installing pyenv..."
         curl -fsSL https://pyenv.run | bash
-            export PYENV_ROOT="$HOME/.pyenv"
-            [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-            eval "$(pyenv init - bash)"
-        echo "Detected Python version: $PYTHON_VERSION"
-        env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install $PYTHON_VERSION
-        pyenv local $PYTHON_VERSION
     else
-        log "Python $PYENV_ROOT already installed."
+        log "pyenv already present at $PYENV_ROOT"
     fi
-   
-    
+
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init - bash)"
+
+    log "Ensuring Python $PYTHON_VERSION is installed (pyenv)..."
+    env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -s "$PYTHON_VERSION"
+
+    cd "$INSTALL_ROOT" || exit 1
+    pyenv local "$PYTHON_VERSION"
+
     if [ -d "$VENV_PATH" ]; then
         log "Virtual environment already exists at $VENV_PATH"
     else
-        # python${PYTHON_VERSION} -m venv "$VENV_PATH"
-        python3 -m venv "$VENV_PATH"
+        python -m venv "$VENV_PATH"
         log "Created virtual environment at $VENV_PATH"
     fi
     
@@ -332,26 +333,29 @@ install_flashlight() {
 
     export USE_CUDA=1 # Set if building for CUDA
 
+    local use_cuda_flag="-DFLASHLIGHT_USE_CUDA=ON"
     if ! command -v nvcc &> /dev/null; then
         log "[INFO] nvcc not found. Switching to CPU-only build."
         use_cuda_flag="-DFLASHLIGHT_USE_CUDA=OFF"
         export USE_CUDA=0
+    fi
+
     # Explicitly point CMake to the Python executable in the venv for robustness
     local python_executable="$VENV_PATH/bin/python"
     cmake .. -DCMAKE_BUILD_TYPE=Release \
              -DPYTHON_EXECUTABLE="$python_executable" \
              "$flashlight_python_flag" \
-             "$use_cuda_flag" \
+             "$use_cuda_flag"
 
     # Build the C++ library AND Python bindings
     log "Building Flashlight sequence (C++ and Python)..."
-    cmake --build . --config Release --parallel "$(nproc)" \
-     
+    cmake --build . --config Release --parallel "$(nproc)"
+
     # Install the Python Bindings into the ACTIVE virtual environment
     log "Installing Flashlight sequence Python bindings into venv..."
     # This assumes setup.py or similar is generated in the build directory.
     cd ..
-    pip install . \
+    pip install .
 
     log "[PASS] Flashlight Python bindings installed via pip."
 
