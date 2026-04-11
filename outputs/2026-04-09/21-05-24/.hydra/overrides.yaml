@@ -1,0 +1,17 @@
+- task.data=/home/chels/NLP/wav2vec_unsupervised/data/clustering/librispeech/precompute_pca512_cls128_mean_pooled
+- task.text_data=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/
+- task.kenlm_path=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/lm.phones.filtered.04.bin
+- common.user_dir=/home/chels/NLP/wav2vec_unsupervised/fairseq_/examples/wav2vec/unsupervised
+- model.code_penalty=6
+- model.gradient_penalty=0.5
+- model.smoothness_weight=1.5
+- common.seed=0
+- optimization.max_update=5
+- dataset.batch_size=32
+- dataset.num_workers=2
+- checkpoint.save_interval_updates=999999
+- dataset.validate_interval_updates=999999
+- +optimizer.groups.generator.optimizer.lr=[0.00004]
+- +optimizer.groups.discriminator.optimizer.lr=[0.00002]
+- ~optimizer.groups.generator.optimizer.amsgrad
+- ~optimizer.groups.discriminator.optimizer.amsgrad

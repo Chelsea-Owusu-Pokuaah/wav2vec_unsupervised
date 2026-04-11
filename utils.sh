@@ -9,7 +9,14 @@ DIR_PATH="$HOME/NLP/wav2vec_unsupervised" # the root directory of the project
 DATA_ROOT="$DIR_PATH/data" # a folder that stores all the data generated from pipeline
 FAIRSEQ_ROOT="$DIR_PATH/fairseq_" # the root directory of the fairseq repository
 KENLM_ROOT="$DIR_PATH/kenlm/build/bin"  # Path to KenLM installation
-VENV_PATH="$DIR_PATH/venv"    # Path to virtual environment (optional)
+# Virtualenv: use ./venv when it exists. To force system Python (e.g. Modal), export VENV_PATH="" before sourcing.
+if [ -z "${VENV_PATH+x}" ]; then
+    if [ -d "$DIR_PATH/venv" ]; then
+        VENV_PATH="$DIR_PATH/venv"
+    else
+        VENV_PATH=""
+    fi
+fi
 RVAD_ROOT="$DIR_PATH/rVADfast/src/rVADfast" # the root directory of the rVADfast repository
 
 GANS_OUTPUT_PHONES="$DATA_ROOT/transcription_phones"
@@ -99,7 +106,19 @@ mark_in_progress() {
 
 setup_path() {
     export HYDRA_FULL_ERROR=1
-    export LD_LIBRARY_PATH="${KALDI_ROOT}/src/lib:${KENLM_ROOT}/lib:${LD_LIBRARY_PATH:-}"
+    local parts=()
+    if [[ -n "${KALDI_ROOT:-}" && -d "${KALDI_ROOT}/src/lib" ]]; then
+        parts+=("${KALDI_ROOT}/src/lib")
+    fi
+    if [[ -n "${KENLM_ROOT:-}" ]]; then
+        [[ -d "${KENLM_ROOT}/lib" ]] && parts+=("${KENLM_ROOT}/lib")
+        [[ -d "${KENLM_ROOT%/bin}/lib" ]] && parts+=("${KENLM_ROOT%/bin}/lib")
+    fi
+    local prefix=""
+    if ((${#parts[@]} > 0)); then
+        prefix="$(IFS=:; echo "${parts[*]}"):"
+    fi
+    export LD_LIBRARY_PATH="${prefix}${LD_LIBRARY_PATH:-}"
 }
 
 

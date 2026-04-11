@@ -35,6 +35,7 @@ python "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/w2vu_generate.py" --config-d
   fairseq.common_eval.path=$MODEL_PATH \
   fairseq.dataset.gen_subset=valid results_path="$GANS_OUTPUT_PHONES" \
   fairseq.task.text_data="$TEXT_OUTPUT/phones/" \
+  fairseq.task.kenlm_path="$TEXT_OUTPUT/phones/lm.phones.filtered.04.bin" \
   fairseq.dataset.batch_size=1 \
   fairseq.dataset.num_workers=0 \
   fairseq.dataset.required_batch_size_multiple=1 \

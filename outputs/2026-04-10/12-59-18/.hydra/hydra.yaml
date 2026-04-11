@@ -1,0 +1,144 @@
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  hydra_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][HYDRA] %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+    root:
+      level: INFO
+      handlers:
+      - console
+    loggers:
+      logging_example:
+        level: DEBUG
+    disable_existing_loggers: false
+  job_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][%(name)s][%(levelname)s] - %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+      file:
+        class: logging.FileHandler
+        formatter: simple
+        filename: ${hydra.job.name}.log
+    root:
+      level: INFO
+      handlers:
+      - console
+      - file
+    disable_existing_loggers: false
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  help:
+    app_name: ${hydra.job.name}
+    header: '${hydra.help.app_name} is powered by Hydra.
+
+      '
+    footer: 'Powered by Hydra (https://hydra.cc)
+
+      Use --hydra-help to view Hydra specific help
+
+      '
+    template: '${hydra.help.header}
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (group=option)
+
+
+      $APP_CONFIG_GROUPS
+
+
+      == Config ==
+
+      Override anything in the config (foo.bar=value)
+
+
+      $CONFIG
+
+
+      ${hydra.help.footer}
+
+      '
+  hydra_help:
+    hydra_help: ???
+    template: 'Hydra (${hydra.runtime.version})
+
+      See https://hydra.cc for more info.
+
+
+      == Flags ==
+
+      $FLAGS_HELP
+
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (For example, append hydra/job_logging=disabled
+      to command line)
+
+
+      $HYDRA_CONFIG_GROUPS
+
+
+      Use ''--cfg hydra'' to Show the Hydra config.
+
+      '
+  output_subdir: .hydra
+  overrides:
+    hydra: []
+    task:
+    - task.data=/home/chels/NLP/wav2vec_unsupervised/data/clustering/librispeech/precompute_pca512_cls128_mean_pooled
+    - task.text_data=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/
+    - task.kenlm_path=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/lm.phones.filtered.04.bin
+    - common.user_dir=/home/chels/NLP/wav2vec_unsupervised/fairseq_/examples/wav2vec/unsupervised
+    - common.tensorboard_logdir=/home/chels/NLP/wav2vec_unsupervised/tb
+    - model.code_penalty=6
+    - model.gradient_penalty=0.5
+    - model.smoothness_weight=1.5
+    - common.seed=0
+    - optimization.max_update=8
+    - dataset.batch_size=32
+    - dataset.num_workers=2
+    - dataset.validate_interval_updates=1
+    - dataset.validate_after_updates=0
+    - checkpoint.save_interval_updates=999999
+    - +optimizer.groups.generator.optimizer.lr=[0.00004]
+    - +optimizer.groups.discriminator.optimizer.lr=[0.00002]
+    - ~optimizer.groups.generator.optimizer.amsgrad
+    - ~optimizer.groups.discriminator.optimizer.amsgrad
+  job:
+    name: hydra_train
+    override_dirname: +optimizer.groups.discriminator.optimizer.lr=[0.00002],+optimizer.groups.generator.optimizer.lr=[0.00004],checkpoint.save_interval_updates=999999,common.seed=0,common.tensorboard_logdir=/home/chels/NLP/wav2vec_unsupervised/tb,common.user_dir=/home/chels/NLP/wav2vec_unsupervised/fairseq_/examples/wav2vec/unsupervised,dataset.batch_size=32,dataset.num_workers=2,dataset.validate_after_updates=0,dataset.validate_interval_updates=1,model.code_penalty=6,model.gradient_penalty=0.5,model.smoothness_weight=1.5,optimization.max_update=8,task.data=/home/chels/NLP/wav2vec_unsupervised/data/clustering/librispeech/precompute_pca512_cls128_mean_pooled,task.kenlm_path=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/lm.phones.filtered.04.bin,task.text_data=/home/chels/NLP/wav2vec_unsupervised/data/text/phones/,~optimizer.groups.discriminator.optimizer.amsgrad,~optimizer.groups.generator.optimizer.amsgrad
+    id: ???
+    num: ???
+    config_name: w2vu
+    env_set: {}
+    env_copy: []
+    config:
+      override_dirname:
+        kv_sep: '='
+        item_sep: ','
+        exclude_keys: []
+  runtime:
+    version: 1.0.7
+    cwd: /home/chels/NLP/wav2vec_unsupervised
+  verbose: false

@@ -1,0 +1,9 @@
+# Install: pip install -r requirements-pipeline.txt
+#
+# g2p_en -> inflect -> typeguard. typeguard 4.5+ expects NoExtraItems in typing_extensions
+# (not present in all stacks); pin typeguard to 4.3.x which works with g2p_en on Python 3.10.
+typing_extensions>=4.12.0
+typeguard>=4.2,<4.5
+# scripts/build_split_phn_references.py (PER references from LibriSpeech transcripts)
+datasets>=2.14.0
+g2p-en

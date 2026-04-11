@@ -382,7 +382,9 @@ prepare_text() {
     log "audio preparation."
     mark_in_progress "$step_name"
     replace_std_endl $ADD_SELF_LOOP_SIMPLE  # this replaces the fixes error caused by the old script std::endl with \n
-    zsh "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/scripts/prepare_text.sh" $LANG $UNLABELLED_TEXT $TEXT_OUTPUT $MIN_PHONES $PHONEMIZER "$FASTTEXT_LIB_MODEL" 0.25 
+    # Quote every arg. If PHONEMIZER is empty, bash drops that word and shifts LID into $5 (phonemizer slot).
+    zsh "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/scripts/prepare_text.sh" \
+      "$LANG" "$UNLABELLED_TEXT" "$TEXT_OUTPUT" "${MIN_PHONES:-3}" "${PHONEMIZER:-G2P}" "$FASTTEXT_LIB_MODEL" 0.25
     # Check if the command was successful
     if [ $? -eq 0 ]; then
         mark_completed "$step_name"

@@ -17,7 +17,7 @@ train_gans(){
    export FAIRSEQ_ROOT=$FAIRSEQ_ROOT
    # export KALDI_ROOT="$DIR_PATH/pykaldi/tools/kaldi"
    export KENLM_ROOT="$KENLM_ROOT"
-   export PYTHONPATH="/$DIR_PATH:$PYTHONPATH"
+   export PYTHONPATH="${DIR_PATH}:${PYTHONPATH:-}"
 
 
    if is_completed "$step_name"; then
@@ -27,7 +27,10 @@ train_gans(){
 
     log "gans training."
     mark_in_progress "$step_name"
-   
+
+    # Absolute TB dir: relative `tb/` breaks TensorBoard under Hydra multirun (cwd changes).
+    local tb_dir="${DIR_PATH}/tb"
+    mkdir -p "$tb_dir"
 
    PYTHONPATH=$FAIRSEQ_ROOT PREFIX=w2v_unsup_gan_xp fairseq-hydra-train \
     -m --config-dir "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/config/gan" \
@@ -36,6 +39,7 @@ train_gans(){
     task.text_data="$TEXT_OUTPUT/phones/" \
     task.kenlm_path="$TEXT_OUTPUT/phones/lm.phones.filtered.04.bin" \
     common.user_dir="$FAIRSEQ_ROOT/examples/wav2vec/unsupervised" \
+    common.tensorboard_logdir="$tb_dir" \
     model.code_penalty=6,10 model.gradient_penalty=0.5,1.0 \
     model.smoothness_weight='1.5' 'common.seed=range(0,5)' \
     +optimizer.groups.generator.optimizer.lr="[0.00004]" \
