@@ -12,7 +12,8 @@ VAL_DATASETS=$2 #/path/to/unlabelled/validation_audio_data
 TEST_DATASETS=$3
 UNLABELLED_TEXT=$4 #/path/to/unlabelled_text_file 
 
-source utils.sh
+# shellcheck source=/dev/null
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 
 # ==================== HELPER FUNCTIONS ====================
@@ -351,7 +352,7 @@ prepare_audio() {
     log "audio preparation"
     mark_in_progress "$step_name"
 
-    zsh "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/scripts/prepare_audio.sh" "$MANIFEST_NONSIL_DIR" $CLUSTERING_DIR $MODEL 512 14
+    zsh "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/scripts/prepare_audio.sh" "$MANIFEST_NONSIL_DIR" $CLUSTERING_DIR $MODEL 128 14 64
 
 
     # Check if the command was successful

@@ -9,7 +9,8 @@ set -o pipefail  # Exit if any command in a pipe fails
 # ==================== CONFIGURATION ====================
 # Set these variables according to your environment and needs
 
-source utils.sh
+# shellcheck source=/dev/null
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 MODEL_PATH=$DIR_PATH/$1 # the model should be a .pt file 
 
@@ -31,7 +32,7 @@ transcription_gans_viterbi(){
 #evaluating the GANS models for validation phones
 python "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/w2vu_generate.py" --config-dir "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/config/generate" \
  --config-name viterbi fairseq.common.user_dir="$FAIRSEQ_ROOT/examples/wav2vec/unsupervised" \
-  fairseq.task.data="$CLUSTERING_DIR/precompute_pca512_cls128_mean_pooled" \
+  fairseq.task.data="$CLUSTERING_DIR/$W2VU_PRECOMPUTE_SUBDIR" \
   fairseq.common_eval.path=$MODEL_PATH \
   fairseq.dataset.gen_subset=valid results_path="$GANS_OUTPUT_PHONES" \
   fairseq.task.text_data="$TEXT_OUTPUT/phones/" \

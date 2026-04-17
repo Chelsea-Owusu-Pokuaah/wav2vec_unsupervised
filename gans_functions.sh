@@ -20,7 +20,9 @@ train_gans(){
    export PYTHONPATH="${DIR_PATH}:${PYTHONPATH:-}"
 
 
-   if is_completed "$step_name"; then
+   # Set FORCE_TRAIN_GANS=1 to ignore pipeline checkpoint (e.g. Modal after syncing data
+   # that still has train_gans:COMPLETED from an old machine).
+   if [[ "${FORCE_TRAIN_GANS:-0}" != "1" ]] && is_completed "$step_name"; then
         log "Skipping gans training  (already completed)"
         return 0
     fi
@@ -35,13 +37,14 @@ train_gans(){
    PYTHONPATH=$FAIRSEQ_ROOT PREFIX=w2v_unsup_gan_xp fairseq-hydra-train \
     -m --config-dir "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/config/gan" \
     --config-name w2vu \
-    task.data="$CLUSTERING_DIR/precompute_pca512_cls128_mean_pooled" \
+    task.data="$CLUSTERING_DIR/$W2VU_PRECOMPUTE_SUBDIR" \
     task.text_data="$TEXT_OUTPUT/phones/" \
     task.kenlm_path="$TEXT_OUTPUT/phones/lm.phones.filtered.04.bin" \
     common.user_dir="$FAIRSEQ_ROOT/examples/wav2vec/unsupervised" \
     common.tensorboard_logdir="$tb_dir" \
     model.code_penalty=6,10 model.gradient_penalty=0.5,1.0 \
     model.smoothness_weight='1.5' 'common.seed=range(0,5)' \
+    model.input_dim="$W2VU_INPUT_DIM" \
     +optimizer.groups.generator.optimizer.lr="[0.00004]" \
     +optimizer.groups.discriminator.optimizer.lr="[0.00002]" \
     ~optimizer.groups.generator.optimizer.amsgrad \

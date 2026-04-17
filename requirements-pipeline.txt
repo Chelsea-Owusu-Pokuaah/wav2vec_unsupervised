@@ -7,3 +7,8 @@ typeguard>=4.2,<4.5
 # scripts/build_split_phn_references.py (PER references from LibriSpeech transcripts)
 datasets>=2.14.0
 g2p-en
+# scripts/plot_training_curves.py
+matplotlib>=3.7.0
+tensorboard>=2.14.0
+# Remote GPU training: pip install modal && modal setup
+# modal>=0.56.0

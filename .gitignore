@@ -18,8 +18,7 @@ __pycache__/
 # --- Datasets & pipeline outputs (large / machine-local) ---
 data/
 
-# # --- Vendored / built dependencies (clone or build via setup scripts) ---
-fairseq_/
+# --- Vendored / built dependencies (clone or build via setup scripts) ---
 kenlm/
 rVADfast/
 sequence/
@@ -27,6 +26,13 @@ sequence/
 # --- Models & artifacts (download separately) ---
 pre-trained/
 lid_model/
+
+# --- Fairseq / Hydra / TensorBoard (regenerated each run) ---
+outputs/
+multirun/
+tb/
+*.tfevents.*
+events.out.tfevents*
 
 # --- Logs ---
 *.log
@@ -39,11 +45,17 @@ logs/
 # --- Tools ---
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+.hypothesis/
 .coverage
+coverage.xml
 htmlcov/
 .tox/
 wandb/
 lightning_logs/
+
+# --- Modal (local cache; app code stays tracked) ---
+.modal/
 
 # --- OS & editors ---
 .DS_Store
@@ -60,7 +72,36 @@ dist/
 *.so
 *.o
 
+# --- Plots / smoke artifacts (regenerated) ---
+smoke_training_curves.png
+smoke_training_curves*/
+training_curves*.png
+
 # --- Misc ---
 nohup.out
 *.tmp
 *.bak
+
+# Local / one-off writeups (remove these lines if you want them versioned)
+TRAINING_PIPELINE_README.md
+TRAINING_PIPELINE_REPORT.md
+# # --- Vendored / built dependencies (clone or build via setup scripts) ---
+# --- Misc ---
+MODAL.md
+
+smoke_training_curves
+
+smoke_training_curves.png
+scripts/smoke_tb_w2vu.sh
+scripts/smoke_tb_w2vu_train.sh
+scripts/smoke_w2vu_train.sh
+scripts/run_modal_prep.py
+scripts/run_modal_librilight_prep.py
+scripts/run_modal.py
+scripts/download_librispeech.py
+scripts/download_librilight.py
+scripts/download_librilight_medium.py
+scripts/download_librilight_small.py
+scripts/download_librilight_text.py
+scripts/download_librilight_text_medium.py
+scripts/download_librilight_text_small.py

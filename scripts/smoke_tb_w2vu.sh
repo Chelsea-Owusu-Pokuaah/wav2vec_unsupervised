@@ -24,11 +24,12 @@ rm -rf "${tb_dir:?}/"* 2>/dev/null || true
 fairseq-hydra-train \
   --config-dir "$FAIRSEQ_ROOT/examples/wav2vec/unsupervised/config/gan" \
   --config-name w2vu \
-  task.data="$CLUSTERING_DIR/precompute_pca512_cls128_mean_pooled" \
+  task.data="$CLUSTERING_DIR/$W2VU_PRECOMPUTE_SUBDIR" \
   task.text_data="$TEXT_OUTPUT/phones/" \
   task.kenlm_path="$TEXT_OUTPUT/phones/lm.phones.filtered.04.bin" \
   common.user_dir="$FAIRSEQ_ROOT/examples/wav2vec/unsupervised" \
   common.tensorboard_logdir="$tb_dir" \
+  model.input_dim="$W2VU_INPUT_DIM" \
   model.code_penalty=6 \
   model.gradient_penalty=0.5 \
   model.smoothness_weight=1.5 \

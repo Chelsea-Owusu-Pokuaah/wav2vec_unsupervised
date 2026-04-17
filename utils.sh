@@ -4,8 +4,18 @@
 # Set these variables according to your environment and needs
 
 # Main directories
-#.... directories to add to root.......
-DIR_PATH="$HOME/NLP/wav2vec_unsupervised" # the root directory of the project
+# Default repo root: directory containing this file (works when sourced as .../utils.sh).
+# Override: export DIR_PATH=/path/to/wav2vec_unsupervised
+if [[ -z "${DIR_PATH:-}" ]]; then
+  case "${BASH_SOURCE[0]:-}" in
+    */utils.sh)
+      DIR_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+      ;;
+    *)
+      DIR_PATH="$HOME/NLP/wav2vec_unsupervised"
+      ;;
+  esac
+fi
 DATA_ROOT="$DIR_PATH/data" # a folder that stores all the data generated from pipeline
 FAIRSEQ_ROOT="$DIR_PATH/fairseq_" # the root directory of the fairseq repository
 KENLM_ROOT="$DIR_PATH/kenlm/build/bin"  # Path to KenLM installation
@@ -43,14 +53,21 @@ LANG="en"
 FASTTEXT_LIB_MODEL="$DIR_PATH/lid_model/lid.176.bin"  # the path to the language identification model
 MODEL="$DIR_PATH/pre-trained/wav2vec_vox_new.pt" # the path to the pre-trained wav2vec model for audio feature extraction
 
-# Dataset specifics
-DATASET_NAME="librispeech"
+# Dataset specifics (export DATASET_NAME=librilight for LibriLight runs)
+: "${DATASET_NAME:=librispeech}"
+# Raw audio extension for initial manifests (.flac for LibriLight; .wav otherwise)
+: "${RAW_AUDIO_EXT:=wav}"
 
 # Output directories (will be created if they don't exist)
 MANIFEST_DIR="$DATA_ROOT/manifests" # the directory that stores the manifest files for the audio dataset
 NONSIL_AUDIO="$DATA_ROOT/processed_audio/" #the directory that stores the audio files with silence removed 
 MANIFEST_NONSIL_DIR="$DATA_ROOT/manifests_nonsil" #the directory that stores the manifest files foe audio dataset with silence removed
 CLUSTERING_DIR="$DATA_ROOT/clustering/$DATASET_NAME"  #stores the output of audio processing, the psuedophonemes(cluster IDs), Audio features
+# Pooled features for wav2vec-U GAN / Viterbi eval (subdirectory under CLUSTERING_DIR).
+# Must match prepare_audio.sh, e.g. precompute_pca128_cls64_mean_pooled for dim=128, num_clusters=64.
+: "${W2VU_PRECOMPUTE_SUBDIR:=precompute_pca512_cls128_mean_pooled}"
+# Hydra model.input_dim — must match the PCA output dimension in precompute_pca{dim}_* .
+: "${W2VU_INPUT_DIM:=512}"
 RESULTS_DIR="$DATA_ROOT/results/$DATASET_NAME" # Stores all the training information of the gans
 CHECKPOINT_DIR="$DATA_ROOT/checkpoints/$DATASET_NAME" # stores the progress checkpoint file which keeps track of processes implemented 
 LOG_DIR="$DATA_ROOT/logs/$DATASET_NAME" #stores the pipeline logs 
@@ -135,7 +152,8 @@ activate_venv() {
 # Create directories if they don't exist
 create_dirs() {
     mkdir -p "$MANIFEST_DIR" "$CLUSTERING_DIR" "$MANIFEST_NONSIL_DIR" \
-             "$RESULTS_DIR" "$CHECKPOINT_DIR" "$LOG_DIR" "$TEXT_OUTPUT" "$GANS_OUTPUT_PHONES"
+             "$RESULTS_DIR" "$CHECKPOINT_DIR" "$LOG_DIR" "$TEXT_OUTPUT" "$GANS_OUTPUT_PHONES" \
+             "$DIR_PATH/tb"
 }
 
 
